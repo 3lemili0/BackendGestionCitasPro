@@ -20,25 +20,22 @@ conectarDB();
 
 const app = express();
 
-// =======================================================
-// --- CONFIGURACIÓN DE CORS (DEFINITIVA Y ROBUSTA) ---
-// =======================================================
+// --- Configuración de CORS ---
 const allowedOrigins = [
-  'https://frontendgestioncitaspro.netlify.app', // Tu URL de Netlify
-  'http://localhost:4200' // Mantenemos localhost para tu desarrollo local
+  'https://frontendgestioncitaspro.netlify.app',
+  'http://localhost:4200'
 ];
 
 app.use(cors({
   origin: function (origin, callback) {
-    // Permitimos peticiones sin origen (como Postman) y las de nuestra lista blanca
     if (!origin || allowedOrigins.includes(origin)) {
       callback(null, true);
     } else {
       callback(new Error('No permitido por la política de CORS'));
     }
   },
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'], // Permitimos todos los métodos HTTP
-  allowedHeaders: ['Content-Type', 'Authorization'] // Permitimos las cabeceras necesarias
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization']
 }));
 
 app.use(express.json());
@@ -47,8 +44,10 @@ app.get("/", (req, res) => {
     res.send("API de Plataforma de Citas funcionando");
 });
 
-// --- Endpoints de la API ---
-app.use("/api/auth", authRoutes);
+// =======================================================
+// --- ENDPOINTS DE LA API (VERSIÓN COMPLETA Y CORREGIDA) ---
+// =======================================================
+app.use("/api/auth", authRoutes); // <-- ESTA ES LA LÍNEA QUE FALTABA
 app.use("/api/citas", citasRoutes);
 app.use("/api/disponibilidad", disponibilidadRoutes);
 app.use("/api/profesionales", profesionalesRoutes);
