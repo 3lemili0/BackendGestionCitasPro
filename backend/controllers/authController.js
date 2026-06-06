@@ -39,6 +39,10 @@ const loginUsuario = async (req, res) => {
             return res.status(401).json({ mensaje: "Contraseña incorrecta." });
         }
         const token = generarJWT(usuario._id, usuario.rol);
+        
+        // =======================================================
+        // --- CORRECCIÓN: AÑADIMOS DE NUEVO EL 'ROL' ---
+        // =======================================================
         res.status(200).json({
             mensaje: "Inicio de sesión exitoso.",
             usuario: {
@@ -46,7 +50,7 @@ const loginUsuario = async (req, res) => {
                 nombre: usuario.nombre,
                 apellido: usuario.apellido,
                 correo: usuario.correo,
-                rol: usuario.rol,
+                rol: usuario.rol, // <-- ESTA ES LA LÍNEA QUE FALTABA
             },
             token
         });
