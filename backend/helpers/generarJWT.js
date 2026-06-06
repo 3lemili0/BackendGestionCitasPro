@@ -1,16 +1,29 @@
 const jwt = require('jsonwebtoken');
 
-/**
- * Genera un JSON Web Token para la autenticación de un usuario.
- * @param {string} id - El ID del usuario.
- * @param {string} rol - El rol del usuario ('cliente' o 'profesional').
- * @returns {string} El token JWT firmado.
- */
-const generarJWT = (id, rol) => {
-    // Firmamos el token con el ID, el rol y la clave secreta del .env
-    // El token expirará en 30 días.
-    return jwt.sign({ id, rol }, process.env.JWT_SECRET, {
-        expiresIn: '30d',
+// =======================================================
+// --- CORRECCIÓN: AÑADIMOS EL ROL AL PAYLOAD DEL TOKEN ---
+// =======================================================
+const generarJWT = (uid, rol) => {
+    // El payload ahora contiene tanto el id como el rol
+    const payload = {
+        usuario: {
+            id: uid,
+            rol: rol
+        }
+    };
+
+    return new Promise((resolve, reject) => {
+        // Firmamos el nuevo payload
+        jwt.sign(payload, process.env.JWT_SECRET, {
+            expiresIn: '8h' // El token expirará en 8 horas
+        }, (err, token) => {
+            if (err) {
+                console.error('Error al generar el token:', err);
+                reject('No se pudo generar el token');
+            } else {
+                resolve(token);
+            }
+        });
     });
 };
 
