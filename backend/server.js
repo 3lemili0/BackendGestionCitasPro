@@ -20,11 +20,26 @@ conectarDB();
 
 const app = express();
 
-// --- Configuración de CORS ---
-// Permitimos peticiones desde la URL del frontend almacenada en las variables de entorno
+// =======================================================
+// --- CONFIGURACIÓN DE CORS (CORREGIDA Y ROBUSTA) ---
+// =======================================================
+const allowedOrigins = [
+  'https://frontendgestioncitaspro.netlify.app', // Tu URL de Netlify
+  'http://localhost:4200' // Mantenemos localhost para tu desarrollo local
+];
+
 const corsOptions = {
-  origin: process.env.FRONTEND_URL,
+  origin: function (origin, callback) {
+    // Permitimos peticiones sin origen (como las de Postman o apps móviles) y las de nuestra lista blanca
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error('No permitido por la política de CORS'));
+    }
+  }
 };
+
+// Usamos la nueva configuración de CORS
 app.use(cors(corsOptions));
 
 app.use(express.json());
@@ -33,7 +48,7 @@ app.get("/", (req, res) => {
     res.send("API de Plataforma de Citas funcionando");
 });
 
-// --- Endpoints de la API (Asegurándonos de que todas estén activas) ---
+// --- Endpoints de la API ---
 app.use("/api/auth", authRoutes);
 app.use("/api/citas", citasRoutes);
 app.use("/api/disponibilidad", disponibilidadRoutes);
