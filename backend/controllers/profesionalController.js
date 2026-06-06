@@ -2,12 +2,16 @@ const Usuario = require("../models/Usuario");
 const Disponibilidad = require("../models/Disponibilidad");
 const Cita = require("../models/Cita");
 
-const listarTodosLosUsuarios = async (req, res) => {
+// =======================================================
+// --- CORRECCIÓN: AHORA SÍ DEVUELVE SOLO PROFESIONALES ---
+// =======================================================
+const listarProfesionales = async (req, res) => {
     try {
-        const usuarios = await Usuario.find().select('nombre apellido rol');
-        res.status(200).json(usuarios);
+        // Buscamos en la base de datos únicamente los usuarios con rol 'profesional'
+        const profesionales = await Usuario.find({ rol: 'profesional' }).select('nombre apellido profesion');
+        res.status(200).json(profesionales);
     } catch (error) {
-        res.status(500).json({ mensaje: "Error del servidor al listar los usuarios." });
+        res.status(500).json({ mensaje: "Error del servidor al listar los profesionales." });
     }
 };
 
@@ -62,6 +66,6 @@ const verDisponibilidad = async (req, res) => {
 };
 
 module.exports = {
-    listarProfesionales: listarTodosLosUsuarios,
+    listarProfesionales,
     verDisponibilidad
 };
