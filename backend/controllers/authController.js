@@ -1,0 +1,78 @@
+const Usuario = require("../models/Usuario");
+const generarJWT = require("../helpers/generarJWT");
+
+/**
+ * @description Registra un nuevo usuario (cliente o profesional).
+ * @route POST /api/auth/registro
+ * @access Público
+ */
+const registrarUsuario = async (req, res) => {
+    const { correo, numeroIdentificacion } = req.body;
+
+    try {
+        const existeUsuario = await Usuario.findOne({ $or: [{ correo }, { numeroIdentificacion }] });
+        if (existeUsuario) {
+            return res.status(400).json({ mensaje: "El correo o número de identificación ya está registrado." });
+        }
+
+        const nuevoUsuario = new Usuario(req.body);
+        const usuarioGuardado = await nuevoUsuario.save();
+
+        res.status(201).json({
+            mensaje: "Usuario registrado exitosamente.",
+            usuario: {
+                _id: usuarioGuardado._id,
+                nombre: usuarioGuardado.nombre,
+                correo: usuarioGuardado.correo,
+                rol: usuarioGuardado.rol,
+            }
+        });
+
+    } catch (error) {
+        console.error("Error en el registro:", error);
+        res.status(500).json({ mensaje: "Error del servidor al registrar el usuario." });
+    }
+};
+
+/**
+ * @description Autentica un usuario y devuelve un token.
+ * @route POST /api/auth/login
+ * @access Público
+ */
+const loginUsuario = async (req, res) => {
+    const { correo, password } = req.body;
+
+    try {
+        const usuario = await Usuario.findOne({ correo });
+        if (!usuario) {
+            return res.status(404).json({ mensaje: "El usuario no existe." });
+        }
+
+        if (!(await usuario.comprobarPassword(password))) {
+            return res.status(401).json({ mensaje: "Contraseña incorrecta." });
+        }
+
+        const token = generarJWT(usuario._id, usuario.rol);
+        
+        res.status(200).json({
+            mensaje: "Inicio de sesión exitoso.",
+            usuario: {
+                _id: usuario._id,
+                nombre: usuario.nombre,
+                apellido: usuario.apellido,
+                correo: usuario.correo,
+                rol: usuario.rol,
+            },
+            token
+        });
+
+    } catch (error) {
+        console.error("Error en el login:", error);
+        res.status(500).json({ mensaje: "Error del servidor al iniciar sesión." });
+    }
+};
+
+module.exports = {
+    registrarUsuario,
+    loginUsuario,
+};
