@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
-const bcrypt = require('bcrypt');
+// CAMBIO CLAVE: Usamos 'bcryptjs' en lugar de 'bcrypt'
+const bcrypt = require('bcryptjs');
 
 const usuarioSchema = new mongoose.Schema({
     nombre: {
@@ -47,6 +48,7 @@ const usuarioSchema = new mongoose.Schema({
     timestamps: true
 });
 
+// Middleware para hashear la contraseña ANTES de guardarla en la BD
 usuarioSchema.pre('save', async function(next) {
     if (!this.isModified('password')) {
         return next();
@@ -56,6 +58,7 @@ usuarioSchema.pre('save', async function(next) {
     next();
 });
 
+// Método personalizado para comprobar la contraseña del usuario
 usuarioSchema.methods.comprobarPassword = async function(passwordFormulario) {
     return await bcrypt.compare(passwordFormulario, this.password);
 };
