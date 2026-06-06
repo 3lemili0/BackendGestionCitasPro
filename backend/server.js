@@ -21,26 +21,25 @@ conectarDB();
 const app = express();
 
 // =======================================================
-// --- CONFIGURACIÓN DE CORS (CORREGIDA Y ROBUSTA) ---
+// --- CONFIGURACIÓN DE CORS (DEFINITIVA Y ROBUSTA) ---
 // =======================================================
 const allowedOrigins = [
   'https://frontendgestioncitaspro.netlify.app', // Tu URL de Netlify
   'http://localhost:4200' // Mantenemos localhost para tu desarrollo local
 ];
 
-const corsOptions = {
+app.use(cors({
   origin: function (origin, callback) {
-    // Permitimos peticiones sin origen (como las de Postman o apps móviles) y las de nuestra lista blanca
+    // Permitimos peticiones sin origen (como Postman) y las de nuestra lista blanca
     if (!origin || allowedOrigins.includes(origin)) {
       callback(null, true);
     } else {
       callback(new Error('No permitido por la política de CORS'));
     }
-  }
-};
-
-// Usamos la nueva configuración de CORS
-app.use(cors(corsOptions));
+  },
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'], // Permitimos todos los métodos HTTP
+  allowedHeaders: ['Content-Type', 'Authorization'] // Permitimos las cabeceras necesarias
+}));
 
 app.use(express.json());
 
