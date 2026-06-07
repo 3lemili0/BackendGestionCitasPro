@@ -4,17 +4,14 @@ const Usuario = require('../models/Usuario');
 // Obtener todas las citas de un usuario (cliente o profesional)
 const getMisCitas = async (req, res) => {
     try {
-        // NOTA: Esta es una versión simplificada sin autenticación.
-        // Deberíamos obtener el ID del usuario del token, pero por ahora lo simulamos.
-        // Asumiremos que el frontend envía el ID del usuario logueado.
-        // Este es un punto a mejorar en el futuro con un middleware de autenticación funcional.
+        const usuarioId = req.usuario._id;
+        const query = (req.usuario.rol === 'profesional') ? { profesional: usuarioId } : { cliente: usuarioId };
         
-        // Simulación (esto es temporal y DEBE ser reemplazado por la autenticación real)
-        // const usuarioId = req.usuario._id; 
-        
-        // Por ahora, para que no se rompa, devolvemos un array vacío.
-        // La lógica real se implementará una vez que la app sea estable.
-        res.status(200).json([]);
+        const citas = await Cita.find(query)
+            .populate('cliente', 'nombre apellido')
+            .populate('profesional', 'nombre apellido');
+            
+        res.status(200).json(citas);
 
     } catch (error) {
         console.error("Error al obtener las citas:", error);
@@ -25,18 +22,15 @@ const getMisCitas = async (req, res) => {
 // Reservar una nueva cita (cliente)
 const reservarCita = async (req, res) => {
     const { profesionalId, fecha, motivo } = req.body;
-    // const clienteId = req.usuario._id; // Debería venir del token
+    const clienteId = req.usuario._id;
 
     if (!profesionalId || !fecha || !motivo) {
         return res.status(400).json({ mensaje: 'Todos los campos son obligatorios.' });
     }
 
     try {
-        // Simulación de clienteId para que no falle
-        const clienteIdSimulado = "60c72b9f9b1e8a001f8e8b45"; // ID de ejemplo
-
         const nuevaCita = new Cita({
-            cliente: clienteIdSimulado,
+            cliente: clienteId,
             profesional: profesionalId,
             fecha: new Date(fecha),
             motivo: motivo,
@@ -54,19 +48,16 @@ const reservarCita = async (req, res) => {
 // Crear una cita manualmente (profesional)
 const crearCitaManual = async (req, res) => {
     const { clienteId, fecha, motivo } = req.body;
-    // const profesionalId = req.usuario._id; // Debería venir del token
+    const profesionalId = req.usuario._id;
 
     if (!clienteId || !fecha || !motivo) {
         return res.status(400).json({ mensaje: 'Cliente, fecha y motivo son obligatorios.' });
     }
 
     try {
-        // Simulación de profesionalId para que no falle
-        const profesionalIdSimulado = "60c72b9f9b1e8a001f8e8b46"; // ID de ejemplo
-
         const nuevaCita = new Cita({
             cliente: clienteId,
-            profesional: profesionalIdSimulado,
+            profesional: profesionalId,
             fecha: new Date(fecha),
             motivo: motivo,
             estado: 'Programada'

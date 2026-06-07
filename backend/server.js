@@ -10,7 +10,7 @@ const swaggerSpec = require('./config/swagger');
 
 // --- Importación de todas las rutas ---
 const authRoutes = require("./routes/authRoutes");
-const citasRoutes = require("./routes/citas");
+const citasRoutes = require("./routes/citasRoutes");
 const disponibilidadRoutes = require("./routes/disponibilidadRoutes");
 const profesionalesRoutes = require("./routes/profesionalesRoutes");
 const usuarioRoutes = require("./routes/usuarioRoutes");
@@ -47,7 +47,7 @@ app.get("/", (req, res) => {
 // =======================================================
 // --- ENDPOINTS DE LA API (VERSIÓN COMPLETA Y CORREGIDA) ---
 // =======================================================
-app.use("/api/auth", authRoutes); // <-- ESTA ES LA LÍNEA QUE FALTABA
+app.use("/api/auth", authRoutes);
 app.use("/api/citas", citasRoutes);
 app.use("/api/disponibilidad", disponibilidadRoutes);
 app.use("/api/profesionales", profesionalesRoutes);
