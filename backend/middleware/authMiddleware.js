@@ -8,18 +8,14 @@ const protegerRuta = async (req, res, next) => {
             token = req.headers.authorization.split(" ")[1];
             const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
-            // --- CAMBIO CLAVE ---
-            // Ya no consultamos la base de datos.
-            // Obtenemos la información del usuario directamente del token decodificado.
             if (decoded.usuario && decoded.usuario._id) {
-                req.usuario = decoded.usuario; // Asignamos el objeto de usuario a la petición.
-                return next(); // Permitimos el paso.
+                req.usuario = decoded.usuario;
+                return next();
             } else {
                 return res.status(401).json({ mensaje: "Token inválido, formato de datos incorrecto." });
             }
 
         } catch (error) {
-            // Este error se dispara si el token ha expirado o está malformado.
             return res.status(401).json({ mensaje: "Token no válido o expirado." });
         }
     }
@@ -29,8 +25,12 @@ const protegerRuta = async (req, res, next) => {
     }
 };
 
+// --- SECCIÓN CORREGIDA ---
+// Hacemos el middleware más robusto para evitar problemas con mayúsculas o espacios.
 const esProfesional = (req, res, next) => {
-    if (req.usuario && req.usuario.rol === 'profesional') {
+    // Verificamos que el usuario y el rol existan.
+    // Luego, convertimos el rol a minúsculas y quitamos espacios antes de comparar.
+    if (req.usuario && typeof req.usuario.rol === 'string' && req.usuario.rol.trim().toLowerCase() === 'profesional') {
         next();
     } else {
         res.status(403).json({ mensaje: "Acceso denegado. Se requiere rol de 'profesional'." });
@@ -38,12 +38,14 @@ const esProfesional = (req, res, next) => {
 };
 
 const esCliente = (req, res, next) => {
-    if (req.usuario && req.usuario.rol === 'cliente') {
+    // Aplicamos la misma lógica robusta aquí por consistencia.
+    if (req.usuario && typeof req.usuario.rol === 'string' && req.usuario.rol.trim().toLowerCase() === 'cliente') {
         next();
     } else {
         res.status(403).json({ mensaje: "Acceso denegado. Se requiere rol de 'cliente'." });
     }
 };
+// --- FIN DE LA SECCIÓN CORREGIDA ---
 
 module.exports = {
     protegerRuta,
