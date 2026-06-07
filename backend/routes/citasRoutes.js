@@ -4,7 +4,7 @@ const { getMisCitas, reservarCita, cancelarCita, actualizarCita, crearCitaManual
 const { protegerRuta, esProfesional, esCliente } = require("../middleware/authMiddleware");
 
 // Rutas para citas
-router.get("/", protegerRuta, getMisCitas);
+router.get("/mis-citas", protegerRuta, getMisCitas);
 router.post("/reservar", protegerRuta, esCliente, reservarCita);
 router.post("/crear-manual", protegerRuta, esProfesional, crearCitaManual);
 router.put("/:id/cancelar", protegerRuta, cancelarCita);
