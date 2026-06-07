@@ -47,20 +47,14 @@ const usuarioSchema = new mongoose.Schema({
     timestamps: true
 });
 
-// =======================================================
-// --- CORRECCIÓN DEL BUG 'next is not a function' ---
-// =======================================================
 // Middleware para hashear la contraseña ANTES de guardarla en la BD
-// Al ser una función async, no necesitamos llamar a next(). Mongoose lo maneja.
-usuarioSchema.pre('save', async function() {
-    // Si la contraseña no ha sido modificada, no hacemos nada
+usuarioSchema.pre('save', async function(next) {
     if (!this.isModified('password')) {
-        return; // Simplemente retornamos
+        return next();
     }
-    // Generamos la sal y hasheamos la contraseña
     const salt = await bcrypt.genSalt(10);
     this.password = await bcrypt.hash(this.password, salt);
-    // No se llama a next() aquí
+    next();
 });
 
 // Método personalizado para comprobar la contraseña del usuario

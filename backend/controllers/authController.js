@@ -9,22 +9,11 @@ const registrarUsuario = async (req, res) => {
             return res.status(400).json({ mensaje: "El correo o número de identificación ya está registrado." });
         }
         const nuevoUsuario = new Usuario(req.body);
-        const usuarioGuardado = await nuevoUsuario.save();
-        res.status(201).json({
-            mensaje: "Usuario registrado exitosamente.",
-            usuario: {
-                _id: usuarioGuardado._id,
-                nombre: usuarioGuardado.nombre,
-                correo: usuarioGuardado.correo,
-                rol: usuarioGuardado.rol,
-            }
-        });
+        await nuevoUsuario.save();
+        res.status(201).json({ mensaje: "Usuario registrado exitosamente." });
     } catch (error) {
         console.error("Error en el registro:", error);
-        res.status(500).json({ 
-            mensaje: "Error del servidor al registrar el usuario.",
-            error: error.message 
-        });
+        res.status(500).json({ mensaje: "Error del servidor al registrar el usuario." });
     }
 };
 
@@ -38,11 +27,11 @@ const loginUsuario = async (req, res) => {
         if (!(await usuario.comprobarPassword(password))) {
             return res.status(401).json({ mensaje: "Contraseña incorrecta." });
         }
-        const token = generarJWT(usuario._id, usuario.rol);
         
-        // =======================================================
-        // --- CORRECCIÓN: AÑADIMOS DE NUEVO EL 'ROL' ---
-        // =======================================================
+        // Generamos el token solo con el ID
+        const token = await generarJWT(usuario._id);
+        
+        // Devolvemos el usuario completo y el token
         res.status(200).json({
             mensaje: "Inicio de sesión exitoso.",
             usuario: {
@@ -50,16 +39,13 @@ const loginUsuario = async (req, res) => {
                 nombre: usuario.nombre,
                 apellido: usuario.apellido,
                 correo: usuario.correo,
-                rol: usuario.rol, // <-- ESTA ES LA LÍNEA QUE FALTABA
+                rol: usuario.rol,
             },
             token
         });
     } catch (error) {
         console.error("Error en el login:", error);
-        res.status(500).json({ 
-            mensaje: "Error del servidor al iniciar sesión.",
-            error: error.message
-        });
+        res.status(500).json({ mensaje: "Error del servidor al iniciar sesión." });
     }
 };
 
