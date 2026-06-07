@@ -27,14 +27,11 @@ const loginUsuario = async (req, res) => {
         if (!(await usuario.comprobarPassword(password))) {
             return res.status(401).json({ mensaje: "Contraseña incorrecta." });
         }
-        
-        const token = await generarJWT(usuario._id);
-        
-        // =======================================================
-        // --- LA SOLUCIÓN REAL Y ÚNICA PARA EL PROBLEMA DEL BOTÓN ---
-        // =======================================================
-        // Nos aseguramos de que la respuesta del login siempre incluya el objeto
-        // de usuario completo, con su ID, nombre, rol, etc.
+
+        // --- CAMBIO CLAVE ---
+        // Ahora pasamos el objeto de usuario completo para generar el token.
+        const token = await generarJWT(usuario);
+
         res.status(200).json({
             mensaje: "Inicio de sesión exitoso.",
             usuario: {

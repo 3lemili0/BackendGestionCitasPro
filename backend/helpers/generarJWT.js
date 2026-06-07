@@ -1,12 +1,18 @@
 const jwt = require('jsonwebtoken');
 
-// Corregimos el payload para que use 'id' en lugar de 'uid',
-// alineándolo con lo que el authMiddleware espera.
-const generarJWT = (id) => { // Cambiamos el nombre del parámetro por claridad
+// La función ahora recibe el objeto de usuario completo.
+const generarJWT = (usuario) => {
     return new Promise((resolve, reject) => {
-        const payload = { id }; // --- ¡ESTA ES LA CORRECCIÓN CLAVE! ---
+        // Creamos un payload que contiene la información esencial del usuario.
+        // Es importante que incluyamos _id, ya que el resto de la app lo usa.
+        const payload = {
+            _id: usuario._id,
+            rol: usuario.rol,
+            nombre: usuario.nombre,
+        };
 
-        jwt.sign(payload, process.env.JWT_SECRET, {
+        // Guardamos este payload dentro de una propiedad 'usuario' en el token.
+        jwt.sign({ usuario: payload }, process.env.JWT_SECRET, {
             expiresIn: '8h'
         }, (err, token) => {
             if (err) {

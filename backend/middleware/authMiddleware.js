@@ -1,5 +1,4 @@
 const jwt = require("jsonwebtoken");
-const Usuario = require("../models/Usuario");
 
 const protegerRuta = async (req, res, next) => {
     let token;
@@ -9,14 +8,18 @@ const protegerRuta = async (req, res, next) => {
             token = req.headers.authorization.split(" ")[1];
             const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
-            req.usuario = await Usuario.findById(decoded.id).select("-password");
-
-            if (!req.usuario) {
-                return res.status(401).json({ mensaje: "Token no válido, usuario no encontrado." });
+            // --- CAMBIO CLAVE ---
+            // Ya no consultamos la base de datos.
+            // Obtenemos la información del usuario directamente del token decodificado.
+            if (decoded.usuario && decoded.usuario._id) {
+                req.usuario = decoded.usuario; // Asignamos el objeto de usuario a la petición.
+                return next(); // Permitimos el paso.
+            } else {
+                return res.status(401).json({ mensaje: "Token inválido, formato de datos incorrecto." });
             }
-            return next();
 
         } catch (error) {
+            // Este error se dispara si el token ha expirado o está malformado.
             return res.status(401).json({ mensaje: "Token no válido o expirado." });
         }
     }
@@ -41,7 +44,6 @@ const esCliente = (req, res, next) => {
         res.status(403).json({ mensaje: "Acceso denegado. Se requiere rol de 'cliente'." });
     }
 };
-
 
 module.exports = {
     protegerRuta,
