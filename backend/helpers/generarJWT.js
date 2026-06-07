@@ -1,10 +1,10 @@
 const jwt = require('jsonwebtoken');
 
-// Volvemos a la versión original que solo usa el ID del usuario.
-// Esto asegura que el proceso de login no se rompa.
-const generarJWT = (uid) => {
+// Corregimos el payload para que use 'id' en lugar de 'uid',
+// alineándolo con lo que el authMiddleware espera.
+const generarJWT = (id) => { // Cambiamos el nombre del parámetro por claridad
     return new Promise((resolve, reject) => {
-        const payload = { uid };
+        const payload = { id }; // --- ¡ESTA ES LA CORRECCIÓN CLAVE! ---
 
         jwt.sign(payload, process.env.JWT_SECRET, {
             expiresIn: '8h'
