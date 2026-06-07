@@ -1,19 +1,10 @@
 const jwt = require('jsonwebtoken');
 
-// =======================================================
-// --- CORRECCIÓN: AÑADIMOS EL ROL AL PAYLOAD DEL TOKEN ---
-// =======================================================
-const generarJWT = (uid, rol) => {
-    // El payload ahora contiene tanto el id como el rol
-    const payload = {
-        usuario: {
-            id: uid,
-            rol: rol
-        }
-    };
-
+const generarJWT = (uid) => {
     return new Promise((resolve, reject) => {
-        // Firmamos el nuevo payload
+        // El payload solo contiene el id del usuario
+        const payload = { uid };
+
         jwt.sign(payload, process.env.JWT_SECRET, {
             expiresIn: '8h' // El token expirará en 8 horas
         }, (err, token) => {
