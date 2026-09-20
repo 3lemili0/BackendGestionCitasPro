@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const { getClientes } = require("../controllers/usuarioController");
-const { protegerRuta } = require("../middleware/authMiddleware"); // <-- Quitamos 'esProfesional' de aquí
+const { protegerRuta } = require("../middleware/authMiddleware");
 
 /**
  * @swagger
@@ -15,7 +15,6 @@ const { protegerRuta } = require("../middleware/authMiddleware"); // <-- Quitamo
  * 200:
  * description: Lista de clientes obtenida con éxito.
  */
-// CORREGIDO: Ahora cualquier usuario logueado con token válido puede consultar la lista
 router.get("/clientes", protegerRuta, getClientes);
 
 module.exports = router;

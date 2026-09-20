@@ -7,10 +7,6 @@ const Usuario = require("../models/Usuario");
  */
 const getClientes = async (req, res) => {
   try {
-    // --- CORRECCIÓN CLAVE ---
-    // Agregamos 'rol' dentro del .select() junto a 'nombre' y 'apellido'.
-    // De esta forma, el frontend recibirá el campo 'rol' y no borrará la lista
-    // al ejecutar el filtro .filter(u => u.rol === 'cliente')
     const clientes = await Usuario.find({ rol: { $regex: /^cliente$/i } })
         .select('nombre apellido rol');
 

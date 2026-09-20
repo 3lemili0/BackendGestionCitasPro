@@ -1,7 +1,6 @@
 const Cita = require('../models/Cita');
 const Usuario = require('../models/Usuario');
 
-// Obtener todas las citas de un usuario (cliente o profesional)
 const getMisCitas = async (req, res) => {
     try {
         const usuarioId = req.usuario._id;

@@ -10,7 +10,6 @@ const { protegerRuta } = require("../middleware/authMiddleware");
  *   description: Endpoints para que los clientes busquen profesionales y consulten su disponibilidad.
  */
 
-// Todas las rutas aquí requieren que el usuario haya iniciado sesión (sea cliente o profesional)
 router.use(protegerRuta);
 
 /**

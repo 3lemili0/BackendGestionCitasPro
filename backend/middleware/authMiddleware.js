@@ -25,11 +25,7 @@ const protegerRuta = async (req, res, next) => {
     }
 };
 
-// --- SECCIÓN CORREGIDA ---
-// Hacemos el middleware más robusto para evitar problemas con mayúsculas o espacios.
 const esProfesional = (req, res, next) => {
-    // Verificamos que el usuario y el rol existan.
-    // Luego, convertimos el rol a minúsculas y quitamos espacios antes de comparar.
     if (req.usuario && typeof req.usuario.rol === 'string' && req.usuario.rol.trim().toLowerCase() === 'profesional') {
         next();
     } else {
@@ -38,14 +34,12 @@ const esProfesional = (req, res, next) => {
 };
 
 const esCliente = (req, res, next) => {
-    // Aplicamos la misma lógica robusta aquí por consistencia.
     if (req.usuario && typeof req.usuario.rol === 'string' && req.usuario.rol.trim().toLowerCase() === 'cliente') {
         next();
     } else {
         res.status(403).json({ mensaje: "Acceso denegado. Se requiere rol de 'cliente'." });
     }
 };
-// --- FIN DE LA SECCIÓN CORREGIDA ---
 
 module.exports = {
     protegerRuta,

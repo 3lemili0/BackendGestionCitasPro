@@ -1,13 +1,8 @@
 const Usuario = require("../models/Usuario");
 const Disponibilidad = require("../models/Disponibilidad");
 const Cita = require("../models/Cita");
-
-// =======================================================
-// --- CORRECCIÓN: AHORA SÍ DEVUELVE SOLO PROFESIONALES ---
-// =======================================================
 const listarProfesionales = async (req, res) => {
     try {
-        // Buscamos en la base de datos únicamente los usuarios con rol 'profesional'
         const profesionales = await Usuario.find({ rol: 'profesional' }).select('nombre apellido profesion');
         res.status(200).json(profesionales);
     } catch (error) {

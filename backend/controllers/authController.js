@@ -28,8 +28,6 @@ const loginUsuario = async (req, res) => {
             return res.status(401).json({ mensaje: "Contraseña incorrecta." });
         }
 
-        // --- CAMBIO CLAVE ---
-        // Ahora pasamos el objeto de usuario completo para generar el token.
         const token = await generarJWT(usuario);
 
         res.status(200).json({

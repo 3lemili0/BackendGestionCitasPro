@@ -76,9 +76,6 @@ const actualizarCita = async (req, res) => {
     }
 };
 
-
-// --- ACCIONES COMUNES ---
-
 /**
  * @description Obtiene el historial de citas del usuario logueado.
  */
