@@ -12,6 +12,8 @@ const citasRoutes = require("./routes/citasRoutes");
 const disponibilidadRoutes = require("./routes/disponibilidadRoutes");
 const profesionalesRoutes = require("./routes/profesionalesRoutes");
 const usuarioRoutes = require("./routes/usuarioRoutes");
+const notificacionRoutes = require("./routes/notificacionRoutes");
+const incidenciaRoutes = require("./routes/incidenciaRoutes");
 
 conectarDB();
 
@@ -45,6 +47,8 @@ app.use("/api/citas", citasRoutes);
 app.use("/api/disponibilidad", disponibilidadRoutes);
 app.use("/api/profesionales", profesionalesRoutes);
 app.use("/api/usuarios", usuarioRoutes);
+app.use("/api/notificaciones", notificacionRoutes);
+app.use("/api/incidencias", incidenciaRoutes);
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 const PORT = process.env.PORT || 3000;
