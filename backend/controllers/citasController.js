@@ -1,15 +1,16 @@
 const Cita = require('../models/Cita');
 const Usuario = require('../models/Usuario');
+const { crearNotificacion } = require('./notificacionController');
 
 const getMisCitas = async (req, res) => {
     try {
         const usuarioId = req.usuario._id;
         const query = (req.usuario.rol === 'profesional') ? { profesional: usuarioId } : { cliente: usuarioId };
-        
+
         const citas = await Cita.find(query)
             .populate('cliente', 'nombre apellido')
             .populate('profesional', 'nombre apellido');
-            
+
         res.status(200).json(citas);
 
     } catch (error) {
@@ -37,9 +38,20 @@ const reservarCita = async (req, res) => {
         });
 
         await nuevaCita.save();
+
+        await crearNotificacion({
+            usuarioId: profesionalId,
+            tipo: 'cita_reservada',
+            mensaje: `${req.usuario.nombre} reservó una cita contigo.`,
+            citaId: nuevaCita._id
+        });
+
         res.status(201).json({ mensaje: 'Cita reservada con éxito.' });
     } catch (error) {
         console.error("Error al reservar la cita:", error);
+        if (error.code === 11000) {
+            return res.status(400).json({ mensaje: 'Ese horario ya no está disponible. Elige otro.' });
+        }
         res.status(500).json({ mensaje: 'Error en el servidor al reservar la cita.' });
     }
 };
@@ -63,9 +75,20 @@ const crearCitaManual = async (req, res) => {
         });
 
         await nuevaCita.save();
+
+        await crearNotificacion({
+            usuarioId: clienteId,
+            tipo: 'cita_manual',
+            mensaje: `${req.usuario.nombre} te agendó una cita.`,
+            citaId: nuevaCita._id
+        });
+
         res.status(201).json({ mensaje: 'Cita creada manualmente con éxito.' });
     } catch (error) {
         console.error("Error al crear la cita manualmente:", error);
+        if (error.code === 11000) {
+            return res.status(400).json({ mensaje: 'Ya tienes una cita agendada en esa fecha y hora.' });
+        }
         res.status(500).json({ mensaje: 'Error en el servidor al crear la cita.' });
     }
 };
@@ -81,6 +104,19 @@ const cancelarCita = async (req, res) => {
         }
         cita.estado = 'Cancelada';
         await cita.save();
+
+        const usuarioQueCancela = req.usuario._id.toString();
+        const destinatarioId = (cita.cliente.toString() === usuarioQueCancela)
+            ? cita.profesional
+            : cita.cliente;
+
+        await crearNotificacion({
+            usuarioId: destinatarioId,
+            tipo: 'cita_cancelada',
+            mensaje: `${req.usuario.nombre} canceló una cita.`,
+            citaId: cita._id
+        });
+
         res.status(200).json({ mensaje: 'Cita cancelada con éxito.', cita });
     } catch (error) {
         res.status(500).json({ mensaje: 'Error en el servidor al cancelar la cita.' });
@@ -101,6 +137,9 @@ const actualizarCita = async (req, res) => {
         await cita.save();
         res.status(200).json({ mensaje: 'Cita actualizada con éxito.', cita });
     } catch (error) {
+        if (error.code === 11000) {
+            return res.status(400).json({ mensaje: 'Ya existe una cita en esa fecha y hora.' });
+        }
         res.status(500).json({ mensaje: 'Error en el servidor al actualizar la cita.' });
     }
 };
