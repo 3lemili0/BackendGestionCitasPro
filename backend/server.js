@@ -1,6 +1,7 @@
 const express = require("express");
 const dotenv = require("dotenv");
 const cors = require("cors");
+const resenaRoutes = require("./routes/resenaRoutes");
 
 dotenv.config();
 
@@ -50,6 +51,7 @@ app.use("/api/usuarios", usuarioRoutes);
 app.use("/api/notificaciones", notificacionRoutes);
 app.use("/api/incidencias", incidenciaRoutes);
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+app.use("/api/resenas", resenaRoutes);
 
 const PORT = process.env.PORT || 3000;
 

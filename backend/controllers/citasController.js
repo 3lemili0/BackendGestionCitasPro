@@ -123,6 +123,29 @@ const cancelarCita = async (req, res) => {
     }
 };
 
+// Marcar una cita como completada (solo el doctor dueño de la cita)
+const completarCita = async (req, res) => {
+    const { id } = req.params;
+    try {
+        const cita = await Cita.findById(id);
+        if (!cita) {
+            return res.status(404).json({ mensaje: 'Cita no encontrada.' });
+        }
+        if (cita.profesional.toString() !== req.usuario._id.toString()) {
+            return res.status(403).json({ mensaje: 'Acceso denegado.' });
+        }
+        if (cita.estado !== 'Programada') {
+            return res.status(400).json({ mensaje: 'Solo se pueden completar citas programadas.' });
+        }
+        cita.estado = 'Completada';
+        await cita.save();
+
+        res.status(200).json({ mensaje: 'Cita marcada como completada.', cita });
+    } catch (error) {
+        res.status(500).json({ mensaje: 'Error en el servidor al completar la cita.' });
+    }
+};
+
 // Actualizar una cita
 const actualizarCita = async (req, res) => {
     const { id } = req.params;
@@ -149,6 +172,7 @@ module.exports = {
     getMisCitas,
     reservarCita,
     cancelarCita,
+    completarCita,
     actualizarCita,
     crearCitaManual
 };
