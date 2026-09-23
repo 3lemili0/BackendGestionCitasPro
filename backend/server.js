@@ -1,7 +1,6 @@
 const express = require("express");
 const dotenv = require("dotenv");
 const cors = require("cors");
-const resenaRoutes = require("./routes/resenaRoutes");
 
 dotenv.config();
 
@@ -15,6 +14,7 @@ const profesionalesRoutes = require("./routes/profesionalesRoutes");
 const usuarioRoutes = require("./routes/usuarioRoutes");
 const notificacionRoutes = require("./routes/notificacionRoutes");
 const incidenciaRoutes = require("./routes/incidenciaRoutes");
+const resenaRoutes = require("./routes/resenaRoutes");
 
 conectarDB();
 
