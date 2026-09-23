@@ -1,3 +1,16 @@
+const Usuario = require("../models/Usuario");
+
+// Definir la función getClientes
+const getClientes = async (req, res) => {
+  try {
+    const clientes = await Usuario.find({ rol: "cliente" });
+    res.json(clientes);
+  } catch (error) {
+    res.status(500).json({ mensaje: "Error al obtener clientes.", error: error.message });
+  }
+};
+
+// Definir la función actualizarPerfil
 const actualizarPerfil = async (req, res) => {
   try {
     const { nombre, apellido, telefono, profesion } = req.body;
@@ -9,8 +22,8 @@ const actualizarPerfil = async (req, res) => {
 
     if (nombre) usuario.nombre = nombre;
     if (apellido) usuario.apellido = apellido;
-    if (telefono !== undefined) usuario.telefono = telefono;
-    if (profesion !== undefined && usuario.rol === 'profesional') usuario.profesion = profesion;
+    if (telefono !== undefined) usuario.telefono = telefono; // corregido
+    if (profesion !== undefined && usuario.rol === "profesional") usuario.profesion = profesion;
 
     await usuario.save();
 
@@ -24,14 +37,15 @@ const actualizarPerfil = async (req, res) => {
         rol: usuario.rol,
         profesion: usuario.profesion,
         telefono: usuario.telefono,
-      }
+      },
     });
   } catch (error) {
     res.status(500).json({ mensaje: "Error al actualizar el perfil.", error: error.message });
   }
 };
 
+// Exportar las funciones
 module.exports = {
   getClientes,
-  actualizarPerfil, // agrégalo al module.exports existente
+  actualizarPerfil,
 };
